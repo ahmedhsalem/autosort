@@ -5,7 +5,7 @@ def TakePhoto():
   
 def SenseMotion():
   from gpiozero import MotionSensor
-  pir = MotionSensor(4)
+  pir = MotionSensor(4) #Defines Pin Number on Raspberry PI
 while True:
     pir.wait_for_motion()
     print("MotionDetected")
