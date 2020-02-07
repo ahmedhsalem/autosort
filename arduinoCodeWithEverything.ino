@@ -76,7 +76,7 @@ void loop() {
                 if(serialData == '1'){
                   whiteLightOn();
                 }
-                if(seialData == '0'){
+                if(serialData == '0'){
                   whiteLightOff();
                 }
                 if(serialData == '2'){
@@ -195,6 +195,7 @@ void spectrometerReadings(){
     Serial.print(",");
   
     Serial.println();
+}
 }
 void whiteLightOn() {
   digitalWrite(whiteLED, HIGH); 
