@@ -25,6 +25,9 @@ const int stepsPerRevolution = 50;
 // Initialize the stepper library on the motor shield:
 Stepper myStepper = Stepper(stepsPerRevolution, dirA, dirB);
 
+//pirSensorSetup
+#define PIR_MOTION_SENSOR 4
+
 //variables for keeping track of electromagnet turning on/off. 
 bool isElectromagnetOn = false; 
 
@@ -45,47 +48,50 @@ void loop() {
       while(1);
     }
 
-    if(serialData == 'S'){
+    if(serialData == '1'){
+      while (isWasteDetected()){
+       //send code 2 to pi 
+      }
+    }
+      else {
+      motor1Move();
+    }
+    
+
+    if(serialData == '3'){
+      motor2FromInitialToSensingStation();
+    }
+
+    if(serialData == '4'){
+      whiteLightOn();
+    }
+
+    if(serialData == '5'){
+      whiteLightOff(); 
+    }
+
+    if(serialData == '6'){
       spectrometerReadings();
     }
-     if(serialData == 'P')
-        {
-          Serial.println("Plastic");
-          motor2PlasticForwards();
-          openDoor();
-          delay(1000);
-          closeDoor();
-          motor2PlasticBackwards();
-        }
-        if(serialData == 'M')
-                {
-                  Serial.println("Metals");
-                  motor2MetalsForwards();
-                  openDoor();
-                  delay(1000);
-                  closeDoor();
-                  motor2MetalsBackwards();
-                }
-                if(serialData == 'W'){
-                   motor2WasteForwards();
-                   openDoor();
-                  delay(1000);
-                  closeDoor();
-                  motor2WasteBackwards();
-                }
-                if(serialData == '1'){
-                  whiteLightOn();
-                }
-                if(serialData == '0'){
-                  whiteLightOff();
-                }
-                if(serialData == '2'){
-                  uvLightOn();
-                }
-                if(serialData == '3'){
-                  uvLightOff();
-                }
-    
+    if(serialData == '7'){
+      electromagnetOff();
+      electromagnetOn();
+      motor2FromSensingStationToInitial();
+    }
+
+    if(serialData == '8'){
+      motor2FromSensingStationToBin2();
+      electromagnetOff();
+      electromagnetOn();
+      motor2FromBin2ToInitial();
+    }
+
+    if(serialData == '9'){
+      motor2FromSensingStationToBin3();
+      electromagnetOff();
+      electromagnetOn();
+      motor2FromBin3ToInitial();
+    }
   }
 }
  
@@ -104,12 +110,15 @@ void setupComponents() {
   digitalWrite(brakeB, LOW);
 
   // Set the motor speed (RPMs):
-  myStepper.setSpeed(300);
+  myStepper.setSpeed(600);
 
   //setup of input window
   Serial.begin(9600);
    pinMode(whiteLED, OUTPUT);
   pinMode(uvLED, OUTPUT); 
+
+  //setup of PIR sensor
+  pinMode(PIR_MOTION_SENSOR, INPUT);
 }
 
 
@@ -131,26 +140,30 @@ void electromagnetOff() {
   isElectromagnetOn = false; 
 }
 
-void motor2PlasticForwards() {
-  myStepper.step(2000);
+void motor2FromInitialToSensingStation() {
+  myStepper.step(5667); //221.4mm actual was 218mm so 3mm off which might be due to error of rod moving 
 }
 
-void motor2PlasticBackwards(){
-  myStepper.step(-2000);
+void motor2FromSensingStationToInitial(){
+  myStepper.step(-5667);
 }
-void motor2MetalsForwards() {
-  myStepper.step(3000);
+void motor2FromSensingStationToBin2() {
+  myStepper.step(8676); //distance was 339mm - actual distance ended up being 335mm 
 }
 
-void motor2MetalsBackwards(){
-  myStepper.step(-3000);
+void motor2FromBin2ToInitial(){
+  myStepper.step(-14343); 
   
-}void motor2WasteForwards() {
-  myStepper.step(1000);
+}void motor2FromSensingStationToBin3() {
+  myStepper.step(17277); // distance measured was 666mm :) 
 }
 
-void motor2WasteBackwards(){
-  myStepper.step(-1000);
+void motor2FromBin3ToInitial(){
+  myStepper.step(-22944);
+}
+
+void motor1Move(){
+  myStepper.step(100);
 }
 
 void spectrometerReadings(){
@@ -211,4 +224,16 @@ void uvLightOn() {
 
 void uvLightOff(){
   digitalWrite(uvLED, LOW);
+}
+
+boolean isWasteDetected(){
+  int sensorValue = digitalRead(PIR_MOTION_SENSOR);
+  if(sensorValue == HIGH)//if the sensor value is HIGH?
+  {
+    return true;//yes,return ture
+  }
+  else
+  {
+    return false;//no,return false
+  }
 }
