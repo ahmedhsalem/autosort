@@ -51,6 +51,7 @@ void loop() {
     if(serialData == '1'){
       while (isWasteDetected()){
        //send code 2 to pi 
+        return;
       }
     }
       else {
