@@ -43,21 +43,22 @@ void loop() {
     
     serialData = Serial.read(); //reads input 
 
-    if(sensor.begin() == false) {
+    /*if(sensor.begin() == false) {
       Serial.println("Sensor does not appear to be connected. Please check wiring. Freezing...");
       while(1);
-    }
+    }*/
 
     if(serialData == '1'){
-      while (isWasteDetected()){
-       //send code 2 to pi 
-        return;
+      
+      while (isWasteDetected()== false){
+        motor1Move();
+        if(isWasteDetected()== true){
+       Serial.println("Item Detected");
+       break; 
       }
+       //send code 2 to pi 
     }
-      else {
-      motor1Move();
     }
-    
 
     if(serialData == '3'){
       motor2FromInitialToSensingStation();
