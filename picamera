@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+from picamera import PiCamera
+from time import sleep
+camera = PiCamera()
+
+# TimeStamp for file name
+import datetime 
+import time 
+date = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+
+# Image Settings
+camera.rotation = 180
+camera.resolution = (2592, 1944)
+camera.framerate = 15
+camera.brightness = 70
+camera.iso = 400
+
+def led_on():
+  ser.write('4')
+  
+def take_picture():
+  while led_on():
+    camera.capture("/home/pi/camera/codetest/"+ date + ".jpg")
+    sleep(2)
+  
+  
+
