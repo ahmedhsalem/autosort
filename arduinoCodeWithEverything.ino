@@ -28,8 +28,6 @@ Stepper myStepper = Stepper(stepsPerRevolution, dirA, dirB);
 //pirSensorSetup
 #define PIR_MOTION_SENSOR 4
 
-//variables for keeping track of electromagnet turning on/off. 
-bool isElectromagnetOn = false; 
 
 void setup() {
   setupComponents();
@@ -53,7 +51,7 @@ void loop() {
       while (isWasteDetected()== false){
         motor1Move();
         if(isWasteDetected()== true){
-       Serial.println("Item Detected");
+       Serial.println("2");
        break; 
       }
        //send code 2 to pi 
