@@ -1,23 +1,19 @@
 #!/usr/bin/python3
 
-
 import serial
 import time
 import re
 ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5)
 
 # picamera settings
-
 from picamera import PiCamera
 from time import sleep
 camera = PiCamera()
-
-  # TimeStamp for file name
+# TimeStamp for file name
 import datetime
 import time
 date = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-
-  # Image Settings
+# image Settings
 camera.rotation = 180
 camera.resolution = (2592, 1944)
 camera.framerate = 15
@@ -29,8 +25,6 @@ input2 = ser.read()
 print ("Read input " + input2.decode("utf-8") + " from Arduino")
 
 # run command from Arduino
-# trigger motor1 and stop if pir senses motion
-# write something back
 trigger = '1'
 ser.write(trigger.encode("ascii"))
 time.sleep(0.5)
@@ -40,17 +34,17 @@ input3 = re.sub('[^A-Za-z0-9]+', '', input3)
 print (input3)
 
 if input3 == "b2rn":
-   trigger = '3'
+   trigger = '3'  # moving box to sensing position
    ser.write(trigger.encode("ascii"))
    time.sleep(8)
-   trigger = '4'
+   trigger = '4'  # turn on white LEDs
    ser.write(trigger.encode("ascii"))
    time.sleep(5)
-   camera.capture("/home/pi/camera/testcode/"+ date + ".jpg")
+   camera.capture("/home/pi/camera/testcode/"+ date + ".jpg")   # take picture while white LEDs are on
    time.sleep(2)
-   trigger = '5'
+   trigger = '5'  # turn off white LEDs
    ser.write(trigger.encode("ascii"))
    time.sleep(0.5)
-   trigger = '6'
+   trigger = '6'  # spectrometer on
    ser.write(trigger.encode("ascii"))
    time.sleep(0.5)
