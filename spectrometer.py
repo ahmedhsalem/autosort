@@ -1,6 +1,17 @@
 def spectrometer_reading():
 
 
+    serial_monitor = serial.Serial(
+
+                        port='COM4',
+                        baudrate=9600,
+                        parity=serial.PARITY_NONE,
+                        stopbits=serial.STOPBITS_ONE,
+                        bytesize=serial.EIGHTBITS,
+                        timeout=1)
+
+    serial_monitor.close()
+    serial_monitor.open()
 
     arduinoData = serial_monitor.readlines()   #If data is there, then read and format it using ASCII OR #y = serial_monitor.analogRead(0)
                                                                             #This sets y equal to a number proportional to the voltage on pin A0.
