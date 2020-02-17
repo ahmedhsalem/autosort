@@ -3,6 +3,7 @@
 import serial
 import time
 import re
+from spectrometer.py import spectrometer_reading()
 ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5)
 
 # picamera settings
@@ -48,3 +49,4 @@ if input3 == "b2rn":
    trigger = '6'  # spectrometer on
    ser.write(trigger.encode("ascii"))
    time.sleep(0.5)
+   bin_location = spectrometer_reading()
