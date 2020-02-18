@@ -50,8 +50,22 @@ if input3 == "b2rn":
    time.sleep(0.5)
 
    trigger = '6'  # spectrometer on
-   if (ser.open):
-       ser.write(trigger.encode("ascii"))
-       time.sleep(5)
-       bin_location = spectrometer_reading()
-       print (bin_location)
+   ser.write(trigger.encode("ascii"))
+   time.sleep(2)
+   bin_location = spectrometer_reading()
+   print (bin_location)
+   
+   if bin_location == "Bin 1":
+      trigger = '9'
+      ser.write(trigger.encode("ascii"))
+      time.sleep(10)
+   
+   if bin_location == "Bin 2"
+      trigger = '8'
+      ser.write(trigger.encode("ascii"))
+      time.sleep(10)
+      
+   if bin_location == "Bin 3"
+      trigger = '7'
+      ser.write(trigger.encode("ascii"))
+      time.sleep(10)
