@@ -55,8 +55,8 @@ if input3 == "b2rn":
    bin_location = spectrometer_reading()
    print (bin_location)
    
-   if bin_location == "Bin 1":
-      trigger = '9'
+   if bin_location == "Bin 1": # general waste
+      trigger = '7'
       ser.write(trigger.encode("ascii"))
       time.sleep(10)
    
@@ -66,6 +66,6 @@ if input3 == "b2rn":
       time.sleep(10)
       
    if bin_location == "Bin 3"
-      trigger = '7'
+      trigger = '9'
       ser.write(trigger.encode("ascii"))
       time.sleep(10)
