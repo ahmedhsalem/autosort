@@ -1,13 +1,13 @@
-int electromagnet = 2; //setup of electromagnet pin 
+int electromagnet = 2; //setup of electromagnet pin
 // Include the Stepper library:
 #include <Stepper.h>
 
-//setup of spectrometer Library 
+//setup of spectrometer Library
 #include "SparkFun_AS7265X.h" //Click here to get the library: http://librarymanager/All#SparkFun_AS7265X
 AS7265X sensor;
 #include <Wire.h>
 
-//setup of lights 
+//setup of lights
 #define whiteLED 7
 #define uvLED 10
 
@@ -37,9 +37,9 @@ char serialData;
 
 void loop() {
   while(true){
-    while(Serial.available() == false){} //do nothing while we wait for python input 
-    
-    serialData = Serial.read(); //reads input 
+    while(Serial.available() == false){} //do nothing while we wait for python input
+
+    serialData = Serial.read(); //reads input
 
     /*if(sensor.begin() == false) {
       Serial.println("Sensor does not appear to be connected. Please check wiring. Freezing...");
@@ -47,14 +47,14 @@ void loop() {
     }*/
 
     if(serialData == '1'){
-      
+
       while (isWasteDetected()== false){
         motor1Move();
         if(isWasteDetected()== true){
        Serial.println("2");
-       break; 
+       break;
       }
-       //send code 2 to pi 
+       //send code 2 to pi
     }
     }
 
@@ -67,12 +67,13 @@ void loop() {
     }
 
     if(serialData == '5'){
-      whiteLightOff(); 
+      whiteLightOff();
     }
 
     if(serialData == '6'){
       spectrometerReadings();
     }
+
     if(serialData == '7'){
       electromagnetOff();
       electromagnetOn();
@@ -94,9 +95,9 @@ void loop() {
     }
   }
 }
- 
+
 void setupComponents() {
-  pinMode(electromagnet,OUTPUT); //setup of electromagnet 
+  pinMode(electromagnet,OUTPUT); //setup of electromagnet
 
  // Set the PWM and brake pins so that the direction pins can be used to control the motor:
   pinMode(pwmA, OUTPUT);
@@ -115,7 +116,7 @@ void setupComponents() {
   //setup of input window
   Serial.begin(9600);
    pinMode(whiteLED, OUTPUT);
-  pinMode(uvLED, OUTPUT); 
+  pinMode(uvLED, OUTPUT);
 
   //setup of PIR sensor
   pinMode(PIR_MOTION_SENSOR, INPUT);
@@ -127,35 +128,35 @@ void openDoor(){
 }
 
 void closeDoor(){
-  electromagnetOn(); 
+  electromagnetOn();
 }
 
 void electromagnetOn() {
   digitalWrite(electromagnet, HIGH);
-  isElectromagnetOn = true; 
+
 }
 
 void electromagnetOff() {
   digitalWrite(electromagnet, LOW);
-  isElectromagnetOn = false; 
+
 }
 
 void motor2FromInitialToSensingStation() {
-  myStepper.step(5667); //221.4mm actual was 218mm so 3mm off which might be due to error of rod moving 
+  myStepper.step(5667); //221.4mm actual was 218mm so 3mm off which might be due to error of rod moving
 }
 
 void motor2FromSensingStationToInitial(){
   myStepper.step(-5667);
 }
 void motor2FromSensingStationToBin2() {
-  myStepper.step(8676); //distance was 339mm - actual distance ended up being 335mm 
+  myStepper.step(8676); //distance was 339mm - actual distance ended up being 335mm
 }
 
 void motor2FromBin2ToInitial(){
-  myStepper.step(-14343); 
-  
+  myStepper.step(-14343);
+
 }void motor2FromSensingStationToBin3() {
-  myStepper.step(17277); // distance measured was 666mm :) 
+  myStepper.step(17277); // distance measured was 666mm :)
 }
 
 void motor2FromBin3ToInitial(){
@@ -167,51 +168,62 @@ void motor1Move(){
 }
 
 void spectrometerReadings(){
+
+      if(sensor.begin() == false)
+    {
+      Serial.println("Sensor does not appear to be connected. Please check wiring. Freezing...");
+      while(1);
+    }
+
+    sensor.disableIndicator(); //Turn off the blue status LED
+
+    Serial.println("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W K,L");
+
    for (int i=0; i < 10; i++){
-   sensor.takeMeasurementsWithBulb(); //This is a hard wait while all 18 channels are measured
-  
-    Serial.print(sensor.getCalibratedA());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedB());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedC());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedD());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedE());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedF());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedG());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedH());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedR());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedI());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedS());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedJ());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedT());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedU());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedV());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedW());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedK());
-    Serial.print(",");
-    Serial.print(sensor.getCalibratedL());
-    Serial.print(",");
-  
-    Serial.println();
-}
+    sensor.takeMeasurementsWithBulb(); //This is a hard wait while all 18 channels are measured
+
+      Serial.print(sensor.getCalibratedA());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedB());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedC());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedD());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedE());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedF());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedG());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedH());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedR());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedI());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedS());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedJ());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedT());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedU());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedV());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedW());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedK());
+      Serial.print(",");
+      Serial.print(sensor.getCalibratedL());
+      Serial.print(",");
+
+      Serial.println();
+    }
 }
 void whiteLightOn() {
-  digitalWrite(whiteLED, HIGH); 
+  digitalWrite(whiteLED, HIGH);
 }
 
 void whiteLightOff(){
@@ -219,7 +231,7 @@ void whiteLightOff(){
 }
 
 void uvLightOn() {
-  digitalWrite(uvLED, HIGH); 
+  digitalWrite(uvLED, HIGH);
 }
 
 void uvLightOff(){
