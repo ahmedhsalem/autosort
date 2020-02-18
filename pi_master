@@ -1,19 +1,18 @@
 #!/usr/bin/python3
-
-import serial
-import time
+from spectrometer import *
+from module_with_functions import *
 import re
-from spectrometer.py import spectrometer_reading()
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5)
 
 # picamera settings
 from picamera import PiCamera
 from time import sleep
 camera = PiCamera()
+
 # TimeStamp for file name
 import datetime
 import time
 date = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+
 # image Settings
 camera.rotation = 180
 camera.resolution = (2592, 1944)
@@ -35,18 +34,24 @@ input3 = re.sub('[^A-Za-z0-9]+', '', input3)
 print (input3)
 
 if input3 == "b2rn":
+
    trigger = '3'  # moving box to sensing position
    ser.write(trigger.encode("ascii"))
    time.sleep(8)
+
    trigger = '4'  # turn on white LEDs
    ser.write(trigger.encode("ascii"))
    time.sleep(5)
    camera.capture("/home/pi/camera/testcode/"+ date + ".jpg")   # take picture while white LEDs are on
    time.sleep(2)
+
    trigger = '5'  # turn off white LEDs
    ser.write(trigger.encode("ascii"))
    time.sleep(0.5)
+
    trigger = '6'  # spectrometer on
-   ser.write(trigger.encode("ascii"))
-   time.sleep(0.5)
-   bin_location = spectrometer_reading()
+   if (ser.open):
+       ser.write(trigger.encode("ascii"))
+       time.sleep(5)
+       bin_location = spectrometer_reading()
+       print (bin_location)
