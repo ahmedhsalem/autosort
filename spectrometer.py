@@ -50,6 +50,21 @@ def spectrometer_reading():
        Correlation=round(Cov_ab/(Stdv_a*Stdv_b),2)
 
        return(Correlation)
+      
+   def slope(a,b):
+       Sumproduct=0
+       Sumsqr=0
+       slopevalue=0
+       for i in range(len(b)):
+           Sumproduct=b[i]*a[i]+Sumproduct
+           Sumsqr=b[i]**2+Sumsqr
+
+       slopevalue=Sumproduct/Sumsqr
+       if slopevalue<1:
+           return(slopevalue)
+       else:
+           slopevalue=1/slopevalue
+           return(slopevalue)
 
    Data_Spectrometer = [['can (decentralised)', [13.67, 5.66, 6.44, 3.53, 5.36, 4.87, 7.86, 8.51, 9.22, 7.58, 9.51, 3.24, 3.56, 4.35, 3.11, 5.85, 3.95, 10.86], 'Aluminium', 0.39, 0.44, 0.48, 0.53, 'Bin 3'],
                  ['can (central)', [13.67, 5.66, 6.44, 3.53, 5.36, 4.87, 7.86, 8.51, 9.22, 7.58, 9.51, 3.24, 3.56, 4.35, 3.11, 5.85, 3.95, 10.86], 'Aluminium', 0.39, 0.44, 0.48, 0.53, 'Bin 3'],
@@ -122,6 +137,9 @@ def spectrometer_reading():
    Correlation_items=[]
    for i in range(len(Data_Spectrometer)):
        Correlation_items.append(0)
+   Slope_items=[]
+   for i in range(len(Data_Spectrometer)):
+      Slope_items.append(0)
 
    Count_paper=0
    Count_PET=0
@@ -158,6 +176,9 @@ def spectrometer_reading():
 
    for i in range(len(Data_Spectrometer)):
         Correlation_items[i]=Corr(Data_Spectrometer[i][1],AverageSpectrometer)
+         
+   for i in range(len(Data_Spectrometer)):
+      Slope_items[i]=slope(Data_Spectrometer[i][1],AverageSpectrometer)  
 
    Baseline_index=0
    if max(Correlation_items)>0.95:
@@ -170,17 +191,14 @@ def spectrometer_reading():
        Baseline_index=6
 
    Criteria= 0.85
-   Percentage=1
+   Percentage=0
    Index=0
 
    for i in range(len(Correlation_items)):
        if Correlation_items[i]>Criteria:
-           if Data_Spectrometer[i][Baseline_index] < Percentage:
-               Percentage= Data_Spectrometer[i][Baseline_index]
+            if Slope_items[i] > Percentage:
+               Percentage= Slope_items[i]
                Index= i
-
-   if Percentage==1:
-       print ("Bin 1")
-
-   else:
-       return Data_Spectrometer[Index][7]
+               
+   #print(Data_Spectrometer[Index][7],Data_Spectrometer[Index][2],Slope_items[Index],Correlation_items[Index])
+   return(Data_Spectrometer[Index][7])
