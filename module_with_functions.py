@@ -4,7 +4,7 @@ import serial
 # Setting up the pyserial module
 
 ser = serial.Serial(
-                    port='COM4',
+                    port='/dev/ttyACM0',
                     baudrate=9600,
                     parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,
