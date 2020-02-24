@@ -1,20 +1,18 @@
-int electromagnet = 2; //setup of electromagnet pin
-// Include the Stepper library:
+// Stepper libraries
 #include <Stepper.h>
+#include <AccelStepper.h>
 
-//setup of spectrometer Library
+// Spectrometer Library
 #include "SparkFun_AS7265X.h" //Click here to get the library: http://librarymanager/All#SparkFun_AS7265X
 AS7265X sensor;
 #include <Wire.h>
 
-//setup of lights
-#define whiteLED 7
-#define uvLED 10
+// Large motor pins
+#define dirPin 2   //same pin as electromagnet
+#define stepPin 3
+#define motorInterfaceType 1
 
-// Define number of steps per revolution:
-const int stepsPerRevolution = 50;
-
-// Give the motor control pins names:
+// Small motor pins
 #define pwmA 3
 #define pwmB 11
 #define brakeA 9
@@ -22,10 +20,23 @@ const int stepsPerRevolution = 50;
 #define dirA 12
 #define dirB 13
 
-// Initialize the stepper library on the motor shield:
+// Electromagnet pin
+#define electromagnet 2
+
+//LED pins
+#define whiteLED 7
+#define uvLED 10
+
+// Small motor steps per revolution
+const int stepsPerRevolution = 50;
+
+// Initialise the AccelStepper.h library:
+AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
+
+// Initialise the stepper.h library:
 Stepper myStepper = Stepper(stepsPerRevolution, dirA, dirB);
 
-//pirSensorSetup
+// PIR sensor pin
 #define PIR_MOTION_SENSOR 4
 
 
@@ -49,7 +60,6 @@ void loop() {
     if(serialData == '1'){
 
       while (isWasteDetected()== false){
-        motor1Move();
         if(isWasteDetected()== true){
        Serial.println("2");
        break;
@@ -59,7 +69,7 @@ void loop() {
     }
 
     if(serialData == '3'){
-      motor2FromInitialToSensingStation();
+      motor1FromInitialToSensingStation();
     }
 
     if(serialData == '4'){
@@ -77,22 +87,23 @@ void loop() {
     if(serialData == '7'){
       electromagnetOff();
       electromagnetOn();
-      motor2FromSensingStationToInitial();
+      motor1FromSensingStationToInitial();
     }
 
     if(serialData == '8'){
-      motor2FromSensingStationToBin2();
+      motor1FromSensingStationToBin2();
       electromagnetOff();
       electromagnetOn();
-      motor2FromBin2ToInitial();
+      motor1FromBin2ToInitial();
     }
 
     if(serialData == '9'){
-      motor2FromSensingStationToBin3();
+      motor1FromSensingStationToBin3();
       electromagnetOff();
       electromagnetOn();
-      motor2FromBin3ToInitial();
+      motor1FromBin3ToInitial();
     }
+    
   }
 }
 
@@ -110,15 +121,19 @@ void setupComponents() {
   digitalWrite(brakeA, LOW);
   digitalWrite(brakeB, LOW);
 
-  // Set the motor speed (RPMs):
-  myStepper.setSpeed(600);
+  // Set the motor speed (RPMs) for stepper.h
+  myStepper.setSpeed(85);
 
-  //setup of input window
+  // Set the maximum speed and acceleration for accelstepper.h
+  stepper.setMaxSpeed(1000);
+  stepper.setAcceleration(500);
+
+  // Setup of input window
   Serial.begin(9600);
    pinMode(whiteLED, OUTPUT);
   pinMode(uvLED, OUTPUT);
 
-  //setup of PIR sensor
+  // Setup of PIR sensor
   pinMode(PIR_MOTION_SENSOR, INPUT);
 }
 
@@ -138,33 +153,36 @@ void electromagnetOn() {
 
 void electromagnetOff() {
   digitalWrite(electromagnet, LOW);
-
 }
 
-void motor2FromInitialToSensingStation() {
-  myStepper.step(5667); //221.4mm actual was 218mm so 3mm off which might be due to error of rod moving
+void motor1FromInitialToSensingStation() {
+  stepper.moveTo(4000);     // Set the target position
+  stepper.runToPosition();  // Run to target position with set speed and acceleration/deceleration
+ }
+
+void motor1FromSensingStationToInitial(){
+  stepper.moveTo(-4000);    
+  stepper.runToPosition();  
 }
 
-void motor2FromSensingStationToInitial(){
-  myStepper.step(-5667);
-}
-void motor2FromSensingStationToBin2() {
-  myStepper.step(8676); //distance was 339mm - actual distance ended up being 335mm
+void motor1FromSensingStationToBin2() {
+  stepper.moveTo(8000);    
+  stepper.runToPosition();  
 }
 
-void motor2FromBin2ToInitial(){
-  myStepper.step(-14343);
-
-}void motor2FromSensingStationToBin3() {
-  myStepper.step(17277); // distance measured was 666mm :)
+void motor1FromBin2ToInitial(){
+  stepper.moveTo(-12000);    
+  stepper.runToPosition();
 }
 
-void motor2FromBin3ToInitial(){
-  myStepper.step(-22944);
+void motor1FromSensingStationToBin3() {
+  stepper.moveTo(16000);    
+  stepper.runToPosition();
 }
 
-void motor1Move(){
-  myStepper.step(100);
+void motor1FromBin3ToInitial(){
+  stepper.moveTo(-20000);    
+  stepper.runToPosition();
 }
 
 void spectrometerReadings(){
