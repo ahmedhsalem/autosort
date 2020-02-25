@@ -8,7 +8,7 @@ AS7265X sensor;
 #include <Wire.h>
 
 // Large motor pins
-#define dirPin 2   //same pin as electromagnet
+#define dirPin 2  
 #define stepPin 3
 #define motorInterfaceType 1
 
@@ -57,51 +57,55 @@ void loop() {
       while(1);
     }*/
 
-    if(serialData == '1'){
+    if(serialData == '1'){   // activate sorting program, will be activated by PIR sensor 1 in the future 
 
       while (isWasteDetected()== false){
-        if(isWasteDetected()== true){
-       Serial.println("2");
+        if(isWasteDetected()== true){     //from PIR sensor 2 in the sensing box
+       Serial.println("2");  //send code 2 to pi, pi then sends instruction number back to the serial port
        break;
       }
-       //send code 2 to pi
-    }
+       
     }
 
     if(serialData == '3'){
-      motor1FromInitialToSensingStation();
+      SmallMotorFullForward();
+      SmallMotorFullReverse();
     }
-
+    
     if(serialData == '4'){
-      whiteLightOn();
+      LargeMotorInitialToBin1SenseBox();
     }
 
     if(serialData == '5'){
-      whiteLightOff();
+      whiteLightOn();
     }
 
     if(serialData == '6'){
-      spectrometerReadings();
+      whiteLightOff();
     }
 
     if(serialData == '7'){
-      electromagnetOff();
-      electromagnetOn();
-      motor1FromSensingStationToInitial();
+      spectrometerReadings();
     }
 
     if(serialData == '8'){
-      motor1FromSensingStationToBin2();
       electromagnetOff();
       electromagnetOn();
-      motor1FromBin2ToInitial();
+      LargeMotorBin1SenseBoxToInitial();
     }
 
     if(serialData == '9'){
-      motor1FromSensingStationToBin3();
+      LargeMotorBin1SenseBoxToBin2();
       electromagnetOff();
       electromagnetOn();
-      motor1FromBin3ToInitial();
+      LargeMotorBin2ToBin1SenseBox();
+    }
+
+    if(serialData == '10'){
+      LargeMotorBin1SenseBoxToBin3();
+      electromagnetOff();
+      electromagnetOn();
+      LargeMotorBin3ToBin1SenseBox();
     }
     
   }
@@ -155,32 +159,41 @@ void electromagnetOff() {
   digitalWrite(electromagnet, LOW);
 }
 
-void motor1FromInitialToSensingStation() {
+void SmallMotorFullForward(){
+  myStepper.step(20000);    //needs calibrating
+
+}
+
+void SmallMotorFullReverse(){
+  myStepper.step(-20000);    //needs calibrating
+}
+
+void LargeMotorInitialToBin1SenseBox() {
   stepper.moveTo(4000);     // Set the target position
   stepper.runToPosition();  // Run to target position with set speed and acceleration/deceleration
  }
 
-void motor1FromSensingStationToInitial(){
+void LargeMotorBin1SenseBoxToInitial(){
   stepper.moveTo(-4000);    
   stepper.runToPosition();  
 }
 
-void motor1FromSensingStationToBin2() {
+void LargeMotorBin1SenseBoxToBin2() {
   stepper.moveTo(8000);    
   stepper.runToPosition();  
 }
 
-void motor1FromBin2ToInitial(){
+void LargeMotorBin2ToBin1SenseBox(){
   stepper.moveTo(-12000);    
   stepper.runToPosition();
 }
 
-void motor1FromSensingStationToBin3() {
+void LargeMotorBin1SenseBoxToBin3() {
   stepper.moveTo(16000);    
   stepper.runToPosition();
 }
 
-void motor1FromBin3ToInitial(){
+void LargeMotorBin3ToBin1SenseBox(){
   stepper.moveTo(-20000);    
   stepper.runToPosition();
 }
@@ -260,10 +273,10 @@ boolean isWasteDetected(){
   int sensorValue = digitalRead(PIR_MOTION_SENSOR);
   if(sensorValue == HIGH)//if the sensor value is HIGH?
   {
-    return true;//yes,return ture
+    return true;   // yes,return ture
   }
   else
   {
-    return false;//no,return false
+    return false;   // no,return false
   }
 }
