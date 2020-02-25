@@ -9,7 +9,7 @@ AS7265X sensor;
 
 // Large motor pins
 #define dirPin 2  
-#define stepPin 3
+#define stepPin 5
 #define motorInterfaceType 1
 
 // Small motor pins
@@ -25,16 +25,15 @@ AS7265X sensor;
 
 //LED pins
 #define whiteLED 7
-#define uvLED 10
 
 // Small motor steps per revolution
-const int stepsPerRevolution = 50;
+const int SmallMotorStepsPerRev = 200;
 
 // Initialise the AccelStepper.h library:
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 // Initialise the stepper.h library:
-Stepper myStepper = Stepper(stepsPerRevolution, dirA, dirB);
+Stepper myStepper = Stepper(SmallMotorStepsPerRev, dirA, dirB);
 
 // PIR sensor pin
 #define PIR_MOTION_SENSOR 4
@@ -113,7 +112,7 @@ void loop() {
 }
 void setupComponents() {
   pinMode(electromagnet,OUTPUT); //setup of electromagnet
-
+ // SMALL MOTOR
  // Set the PWM and brake pins so that the direction pins can be used to control the motor:
   pinMode(pwmA, OUTPUT);
   pinMode(pwmB, OUTPUT);
@@ -125,9 +124,10 @@ void setupComponents() {
   digitalWrite(brakeA, LOW);
   digitalWrite(brakeB, LOW);
 
-  // Set the motor speed (RPMs) for stepper.h
+  // Set the motor speed (RPMs) for stepper.h, maximum is 90
   myStepper.setSpeed(85);
 
+  // LARGE MOTOR
   // Set the maximum speed and acceleration for accelstepper.h
   stepper.setMaxSpeed(1000);
   stepper.setAcceleration(500);
@@ -140,7 +140,6 @@ void setupComponents() {
   // Setup of PIR sensor
   pinMode(PIR_MOTION_SENSOR, INPUT);
 }
-
 
 void openDoor(){
   electromagnetOff();
@@ -160,12 +159,12 @@ void electromagnetOff() {
 }
 
 void SmallMotorFullForward(){
-  myStepper.step(20000);    //needs calibrating
+  myStepper.step(2000);    //needs calibrating
 
 }
 
 void SmallMotorFullReverse(){
-  myStepper.step(-20000);    //needs calibrating
+  myStepper.step(-2000);    //needs calibrating
 }
 
 void LargeMotorInitialToBin1SenseBox() {
@@ -183,7 +182,7 @@ void LargeMotorBin1SenseBoxToBin2() {
   stepper.runToPosition();  
 }
 
-void LargeMotorBin2ToBin1SenseBox(){
+void LargeMotorBin2ToInitial(){
   stepper.moveTo(-12000);    
   stepper.runToPosition();
 }
@@ -193,7 +192,7 @@ void LargeMotorBin1SenseBoxToBin3() {
   stepper.runToPosition();
 }
 
-void LargeMotorBin3ToBin1SenseBox(){
+void LargeMotorBin3ToInitial(){
   stepper.moveTo(-20000);    
   stepper.runToPosition();
 }
@@ -253,6 +252,7 @@ void spectrometerReadings(){
       Serial.println();
     }
 }
+
 void whiteLightOn() {
   digitalWrite(whiteLED, HIGH);
 }
@@ -261,13 +261,6 @@ void whiteLightOff(){
   digitalWrite(whiteLED, LOW);
 }
 
-void uvLightOn() {
-  digitalWrite(uvLED, HIGH);
-}
-
-void uvLightOff(){
-  digitalWrite(uvLED, LOW);
-}
 
 boolean isWasteDetected(){
   int sensorValue = digitalRead(PIR_MOTION_SENSOR);
