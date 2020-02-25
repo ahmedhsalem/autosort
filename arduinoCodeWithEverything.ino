@@ -110,7 +110,7 @@ void loop() {
     
   }
 }
-
+}
 void setupComponents() {
   pinMode(electromagnet,OUTPUT); //setup of electromagnet
 
