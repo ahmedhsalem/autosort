@@ -51,14 +51,10 @@ void loop() {
 
     serialData = Serial.read(); //reads input
 
-    /*if(sensor.begin() == false) {
-      Serial.println("Sensor does not appear to be connected. Please check wiring. Freezing...");
-      while(1);
-    }*/
-
     if(serialData == '1'){   // activate sorting program, will be activated by PIR sensor 1 in the future 
 
       while (isWasteDetected()== false){
+        SmallMotorFullForward();
         if(isWasteDetected()== true){     //from PIR sensor 2 in the sensing box
        Serial.println("2");  //send code 2 to pi, pi then sends instruction number back to the serial port
        break;
@@ -67,48 +63,43 @@ void loop() {
     }
 
     if(serialData == '3'){
-      SmallMotorFullForward();
-      SmallMotorFullReverse();
+      LargeMotorInitialToBin1SenseBox();
     }
     
     if(serialData == '4'){
-      LargeMotorInitialToBin1SenseBox();
-    }
-
-    if(serialData == '5'){
       whiteLightOn();
     }
 
-    if(serialData == '6'){
+    if(serialData == '5'){
       whiteLightOff();
     }
 
-    if(serialData == '7'){
+    if(serialData == '6'){
       spectrometerReadings();
     }
 
+    if(serialData == '7'){
+      openDoor();
+      closeDoor();
+      LargeMotorBin1SenseBoxToInitial();    
+    }
+
     if(serialData == '8'){
-      electromagnetOff();
-      electromagnetOn();
-      LargeMotorBin1SenseBoxToInitial();
+      LargeMotorBin1SenseBoxToBin2();
+      openDoor();
+      closeDoor();
+      LargeMotorBin2ToInitial();
     }
 
     if(serialData == '9'){
-      LargeMotorBin1SenseBoxToBin2();
-      electromagnetOff();
-      electromagnetOn();
-      LargeMotorBin2ToBin1SenseBox();
-    }
-
-    if(serialData == '10'){
       LargeMotorBin1SenseBoxToBin3();
-      electromagnetOff();
-      electromagnetOn();
-      LargeMotorBin3ToBin1SenseBox();
+      openDoor();
+      closeDoor();
+      LargeMotorBin3ToInitial();
     }
     
   }
-}
+  }
 }
 void setupComponents() {
   pinMode(electromagnet,OUTPUT); //setup of electromagnet
