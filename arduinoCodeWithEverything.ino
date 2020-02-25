@@ -21,7 +21,7 @@ AS7265X sensor;
 #define dirB 13
 
 // Electromagnet pin
-#define electromagnet 2
+#define electromagnet 10
 
 //LED pins
 #define whiteLED 7
