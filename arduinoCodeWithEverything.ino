@@ -1,39 +1,33 @@
 // Stepper libraries
 #include <Stepper.h>
-#include <AccelStepper.h>
 
 // Spectrometer Library
 #include "SparkFun_AS7265X.h" //Click here to get the library: http://librarymanager/All#SparkFun_AS7265X
 AS7265X sensor;
 #include <Wire.h>
 
-// Large motor pins
+// Large motor 
+#define motorInterfaceType 1
 #define dirPin 2  
 #define stepPin 5
-#define motorInterfaceType 1
+const int LargeMotorStepsPerRev = 200;
+Stepper stepper2 = Stepper(LargeMotorStepsPerRev, stepPin, dirPin);
 
-// Small motor pins
+// Small motor 
 #define pwmA 3
 #define pwmB 11
 #define brakeA 9
 #define brakeB 8
 #define dirA 12
 #define dirB 13
+const int SmallMotorStepsPerRev = 200;
+Stepper stepper1 = Stepper(SmallMotorStepsPerRev, dirA, dirB);
 
 // Electromagnet pin
 #define electromagnet 10
 
 //LED pins
 #define whiteLED 7
-
-// Small motor steps per revolution
-const int SmallMotorStepsPerRev = 200;
-
-// Initialise the AccelStepper.h library:
-AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
-
-// Initialise the stepper.h library:
-Stepper myStepper = Stepper(SmallMotorStepsPerRev, dirA, dirB);
 
 // PIR sensor pin
 #define PIR_MOTION_SENSOR 4
@@ -53,15 +47,16 @@ void loop() {
 
     if(serialData == '1'){   // activate sorting program, will be activated by PIR sensor 1 in the future 
 
-      while (isWasteDetected()== false){
-        SmallMotorFullForward();
-        if(isWasteDetected()== true){     //from PIR sensor 2 in the sensing box
-       Serial.println("2");  //send code 2 to pi, pi then sends instruction number back to the serial port
+     while (isWasteDetected()== false){
+       SmallMotorFullForward();
+       if(isWasteDetected()== true){     //from PIR sensor 2 in the sensing box
+      // Serial.println("2");  //send code 2 to pi, pi then sends instruction number back to the serial port
        break;
       }
-       
+    
     }
-
+    }
+    
     if(serialData == '3'){
       LargeMotorInitialToBin1SenseBox();
     }
@@ -100,33 +95,26 @@ void loop() {
     
   }
   }
-}
+
+
 void setupComponents() {
   pinMode(electromagnet,OUTPUT); //setup of electromagnet
  // SMALL MOTOR
- // Set the PWM and brake pins so that the direction pins can be used to control the motor:
+ // Drection and step pins
   pinMode(pwmA, OUTPUT);
   pinMode(pwmB, OUTPUT);
-  pinMode(brakeA, OUTPUT);
-  pinMode(brakeB, OUTPUT);
-
   digitalWrite(pwmA, HIGH);
   digitalWrite(pwmB, HIGH);
-  digitalWrite(brakeA, LOW);
-  digitalWrite(brakeB, LOW);
-
-  // Set the motor speed (RPMs) for stepper.h, maximum is 90
-  myStepper.setSpeed(85);
+  // Motor speed, maximum 90 RPM
+  stepper1.setSpeed(60);
 
   // LARGE MOTOR
-  // Set the maximum speed and acceleration for accelstepper.h
-  stepper.setMaxSpeed(1000);
-  stepper.setAcceleration(500);
+  // Set the maximum speed 
+  stepper2.setSpeed(700);
 
   // Setup of input window
   Serial.begin(9600);
    pinMode(whiteLED, OUTPUT);
-  pinMode(uvLED, OUTPUT);
 
   // Setup of PIR sensor
   pinMode(PIR_MOTION_SENSOR, INPUT);
@@ -150,42 +138,36 @@ void electromagnetOff() {
 }
 
 void SmallMotorFullForward(){
-  myStepper.step(2000);    //needs calibrating
+  stepper1.step(200);    
 
 }
 
 void SmallMotorFullReverse(){
-  myStepper.step(-2000);    //needs calibrating
+  stepper1.step(-1000);    // needs calibrating
 }
 
 void LargeMotorInitialToBin1SenseBox() {
-  stepper.moveTo(4000);     // Set the target position
-  stepper.runToPosition();  // Run to target position with set speed and acceleration/deceleration
- }
+  stepper2.step(16000);     // needs calibrating
+}
 
 void LargeMotorBin1SenseBoxToInitial(){
-  stepper.moveTo(-4000);    
-  stepper.runToPosition();  
+  stepper2.step(16000);     // needs calibrating
 }
 
 void LargeMotorBin1SenseBoxToBin2() {
-  stepper.moveTo(8000);    
-  stepper.runToPosition();  
+  stepper2.step(-16000);     // needs calibrating 
 }
 
 void LargeMotorBin2ToInitial(){
-  stepper.moveTo(-12000);    
-  stepper.runToPosition();
+  stepper2.step(-16000);     // needs calibrating
 }
 
 void LargeMotorBin1SenseBoxToBin3() {
-  stepper.moveTo(16000);    
-  stepper.runToPosition();
+  stepper2.step(-16000);     // needs calibrating
 }
 
 void LargeMotorBin3ToInitial(){
-  stepper.moveTo(-20000);    
-  stepper.runToPosition();
+  stepper2.step(-16000);     // needs calibrating
 }
 
 void spectrometerReadings(){
